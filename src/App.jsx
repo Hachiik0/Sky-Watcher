@@ -2,9 +2,9 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { useState } from "react";
 import "./App.css";
 import search from "./assets/icons/search.svg";
+import Forecast from "./Pages/Forecast";
 import { useStateContext } from "./Context";
 import { BackgroundLayout, WeatherCard } from "./Components";
-import Forecast from "./pages/Forecast";
 
 function App() {
   const [input, setInput] = useState("");

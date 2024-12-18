@@ -8,6 +8,7 @@ import { BackgroundLayout, WeatherCard } from "./Components";
 
 function App() {
   const [input, setInput] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false); // State untuk menu
   const { weather, thisLocation, place, setPlace } = useStateContext();
 
   const submitCity = () => {
@@ -21,10 +22,12 @@ function App() {
         {/* Background layout tetap ada di seluruh halaman */}
         <BackgroundLayout />
 
-        {/* Navbar tetap ada */}
+        {/* Navbar */}
         <nav className="w-full p-3 flex justify-between items-center px-8 bg-cyan-400 shadow-md fixed top-0 z-10">
           <h1 className="font-bold tracking-wide text-3xl">Sky Watcher</h1>
-          <div className="bg-white w-[15rem] overflow-hidden shadow-2xl rounded flex items-center p-2 gap-2">
+
+          {/* Kolom pencarian dengan ukuran responsif */}
+          <div className="bg-white w-full sm:w-[12rem] md:w-[15rem] overflow-hidden shadow-2xl rounded flex items-center p-2 gap-2">
             <img src={search} alt="search" className="w-[1.5rem] h-[1.5rem]" />
             <input
               onKeyUp={(e) => {
@@ -39,7 +42,21 @@ function App() {
               onChange={(e) => setInput(e.target.value)}
             />
           </div>
-          <div className="flex gap-4">
+
+          {/* Tombol Hamburger di layar kecil */}
+          <button
+            className="sm:hidden text-white text-3xl"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            ☰
+          </button>
+
+          {/* Menu Navigasi - Menyembunyikan di perangkat kecil */}
+          <div
+            className={`flex flex-col sm:flex-row sm:block gap-4 sm:flex ${
+              menuOpen ? "block" : "hidden"
+            }`}
+          >
             <Link to="/" className="px-4 py-2 bg-blue-600 rounded">
               Home
             </Link>
@@ -49,14 +66,13 @@ function App() {
           </div>
         </nav>
 
-        {}
         <div className="pt-[5rem]">
           <Routes>
             <Route
               path="/"
               element={
                 <>
-                  <main className="w-full flex flex-col items-center py-4 px-[10%]">
+                  <main className="w-full flex flex-col items-center py-4 px-4 sm:px-10">
                     <WeatherCard
                       place={thisLocation}
                       windspeed={weather.wspd}

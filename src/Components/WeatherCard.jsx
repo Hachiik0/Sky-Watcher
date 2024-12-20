@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import React, { useEffect, useState } from "react";
 import { useDate } from "../Utils/useDate";
 import sun from "../assets/icons/sun.png";
@@ -18,6 +17,7 @@ const WeatherCard = ({
   heatIndex,
   iconString,
   conditions,
+  addFavorite, // Tambahkan prop addFavorite
 }) => {
   const [icon, setIcon] = useState(sun);
   const { time } = useDate();
@@ -43,7 +43,16 @@ const WeatherCard = ({
   }, [iconString]);
 
   return (
-    <div className="w-[22rem] min-w-[22rem] h-[30rem] glassCard p-4">
+    <div className="w-[22rem] min-w-[22rem] h-[30rem] glassCard p-4 relative">
+      {/* Tombol Add Favorite */}
+      <button
+        onClick={addFavorite}
+        className="absolute top-4 right-4 bg-blue-600 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
+        title="Add to Favorites"
+      >
+        +
+      </button>
+
       <div className="flex w-full just-center, items-center gap-4 mt-12 mb-4">
         <img src={icon} alt="weather_icon" />
         <p className="font-bold text-5xl flex justify-center items-center">

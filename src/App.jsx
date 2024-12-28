@@ -38,15 +38,14 @@ function App() {
   };
 
   const addFavorite = async () => {
-    if (!favorites.includes(thisLocation) && thisLocation) {
-      const newFavorites = [...favorites, thisLocation];
+    if (!favorites.some((fav) => fav.name === thisLocation) && thisLocation) {
+      const newFavorite = { id: new Date().getTime(), name: thisLocation }; // Menambahkan id baru
+      const newFavorites = [...favorites, newFavorite];
       saveFavorites(newFavorites);
 
       try {
         // Tambahkan ke database
-        await axios.post("http://localhost:5000/favorites", {
-          name: thisLocation,
-        });
+        await axios.post("http://localhost:5000/favorites", newFavorite);
         setMessage(`${thisLocation} berhasil ditambahkan ke daftar favorit!`);
         setIsModalOpen(true);
       } catch (error) {
@@ -59,16 +58,13 @@ function App() {
   };
 
   const removeFavorite = async (city) => {
-    const newFavorites = favorites.filter((fav) => fav !== city);
+    const newFavorites = favorites.filter((fav) => fav.id !== city.id); // Menghapus berdasarkan id
     saveFavorites(newFavorites);
 
     try {
       // Hapus dari database
-      const favoriteToDelete = favorites.find((fav) => fav === city);
-      await axios.delete(
-        `http://localhost:5000/favorites/${favoriteToDelete.id}`
-      );
-      setMessage(`${city} berhasil dihapus dari daftar favorit!`);
+      await axios.delete(`http://localhost:5000/favorites/${city.id}`);
+      setMessage(`${city.name} berhasil dihapus dari daftar favorit!`);
       setIsModalOpen(true);
     } catch (error) {
       console.error("Gagal menghapus data dari database:", error);

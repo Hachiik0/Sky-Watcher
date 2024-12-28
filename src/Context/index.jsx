@@ -8,25 +8,34 @@ export const StateContextProvider = ({ children }) => {
   const [values, setValues] = useState([]);
   const [place, setPlace] = useState("Yogyakarta");
   const [thisLocation, setLocation] = useState("");
+  const [favorites, setFavorites] = useState([]); // Menambahkan state untuk favorites
 
-  // Tambahkan fungsi untuk sinkronisasi dengan db.json
+  // Fungsi untuk sinkronisasi dengan db.json dan localStorage
   const fetchFavoritesFromDB = async () => {
     try {
       const response = await axios.get("http://localhost:5000/favorites");
       const dbFavorites = response.data;
-      localStorage.setItem("favorites", JSON.stringify(dbFavorites));
-      setFavorites(dbFavorites); // Perbarui state lokal
+      localStorage.setItem("favorites", JSON.stringify(dbFavorites)); // Menyimpan ke localStorage
+      setFavorites(dbFavorites); // Memperbarui state favorites
     } catch (error) {
       console.error("Gagal memuat data dari database:", error);
     }
   };
 
-  // Panggil fungsi ini di dalam useEffect untuk sinkronisasi awal
+  // Mengambil data favorites dari localStorage saat pertama kali dimuat
+  useEffect(() => {
+    const storedFavorites = localStorage.getItem("favorites");
+    if (storedFavorites) {
+      setFavorites(JSON.parse(storedFavorites)); // Memperbarui state dengan data dari localStorage
+    }
+  }, []);
+
+  // Panggil fungsi sinkronisasi db.json saat aplikasi dimuat
   useEffect(() => {
     fetchFavoritesFromDB();
   }, []);
 
-  // fetch api
+  // Fungsi untuk mengambil data cuaca dari API
   const fetchWeather = async () => {
     const options = {
       method: "GET",
@@ -53,7 +62,6 @@ export const StateContextProvider = ({ children }) => {
       setWeather(thisData.values[0]);
     } catch (e) {
       console.error(e);
-      // if the api throws error.
       alert("Kota Tidak di Temukan");
     }
   };
@@ -74,6 +82,8 @@ export const StateContextProvider = ({ children }) => {
         values,
         thisLocation,
         place,
+        favorites, // Menambahkan favorites ke dalam context
+        setFavorites, // Menambahkan setFavorites ke dalam context
       }}
     >
       {children}

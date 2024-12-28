@@ -59,15 +59,15 @@ const WeatherCard = ({
           {temperature} &deg;C
         </p>
       </div>
-      <div className="font-bold text-center text-xl">{place}</div>
+      <p className="font-bold text-center text-xl">{place}</p>
       <div className="w-full flex justify-between items-center mt-4">
         <p className="flex-1 text-center p-2">{new Date().toDateString()}</p>
         <p className="flex-1 text-center p-2">{time}</p>
       </div>
       <div className="w-full flex justify-between items-center mt-4 gap-4">
-        <p className="flex-1 text-center p-2 font-bold bg-cyan-400 shadow rounded-lg">
-          Wind Speed <p className="font-normal">{windspeed} km/h</p>
-        </p>
+        <div className="flex-1 text-center p-2 font-bold bg-cyan-400 shadow rounded-lg">
+          Wind Speed <span className="font-normal">{windspeed} km/h</span>
+        </div>
         <p className="flex-1 text-center p-2 font-bold rounded-lg bg-cyan-400">
           Humidity <p className="font-normal">{humidity} gm/m&#179;</p>
         </p>

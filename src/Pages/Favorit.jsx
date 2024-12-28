@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 const FavoritesPage = ({ favorites, selectFavorite, removeFavorite }) => {
   const navigate = useNavigate();
 
-  const handleViewWeather = (city) => {
-    selectFavorite(city); // Set kota yang dipilih
+  const handleViewWeather = (cityName) => {
+    selectFavorite(cityName); // Set kota yang dipilih
     navigate("/"); // Arahkan ke halaman Home
   };
 
@@ -19,18 +19,19 @@ const FavoritesPage = ({ favorites, selectFavorite, removeFavorite }) => {
           {favorites.map((city, index) => (
             <div
               key={index}
-              className="bg-cyan-600 text-white p-4 rounded shadow-md flex flex-col justify-between"
+              className="bg-cyan-400 text-white p-4 rounded shadow-md flex flex-col justify-between"
             >
-              <h3 className="text-lg font-semibold">{city}</h3>
+              {/* Pastikan hanya menampilkan name dari city */}
+              <h3 className="text-lg font-semibold">{city.name}</h3>
               <div className="flex justify-between mt-4">
                 <button
-                  onClick={() => handleViewWeather(city)}
+                  onClick={() => handleViewWeather(city.name)}
                   className="px-3 py-1 bg-green-500 rounded"
                 >
                   Liat cuaca
                 </button>
                 <button
-                  onClick={() => removeFavorite(city)}
+                  onClick={() => removeFavorite(city)} // Menghapus berdasarkan city object
                   className="px-3 py-1 bg-red-500 rounded"
                 >
                   Hapus

@@ -3,36 +3,76 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import "./App.css";
 import search from "./assets/icons/search.svg";
 import Forecast from "./Pages/Forecast";
-import FavoritesPage from "./Pages/Favorit"; // Import FavoritesPage
+import FavoritesPage from "./Pages/Favorit";
 import { useStateContext } from "./Context";
 import { BackgroundLayout, WeatherCard } from "./Components";
+import axios from "axios";
 
 function App() {
   const [input, setInput] = useState("");
   const [menuOpen, setMenuOpen] = useState(false); // Mengatur state untuk kontrol menu
   const { weather, thisLocation, place, setPlace } = useStateContext();
-  const [favorites, setFavorites] = useState([]);
+  const [favorites, setFavorites] = useState(() => {
+    const savedFavorites = JSON.parse(localStorage.getItem("favorites"));
+    return savedFavorites || [];
+  });
   const [message, setMessage] = useState(""); // State untuk pesan
   const [isModalOpen, setIsModalOpen] = useState(false); // State untuk modal
+
+  // Fungsi untuk menyimpan favorit ke localStorage dan db.json
+  const saveFavorites = async (newFavorites) => {
+    setFavorites(newFavorites);
+    localStorage.setItem("favorites", JSON.stringify(newFavorites));
+
+    try {
+      // Sinkronkan ke database (update semua data)
+      await axios.put("http://localhost:5000/favorites", newFavorites);
+    } catch (error) {
+      console.error("Gagal menyimpan data ke database:", error);
+    }
+  };
 
   const submitCity = () => {
     setPlace(input);
     setInput("");
   };
 
-  const addFavorite = () => {
+  const addFavorite = async () => {
     if (!favorites.includes(thisLocation) && thisLocation) {
-      setFavorites([...favorites, thisLocation]);
-      setMessage(`${thisLocation} berhasil ditambahkan ke daftar favorit!`);
-      setIsModalOpen(true); // Tampilkan modal
+      const newFavorites = [...favorites, thisLocation];
+      saveFavorites(newFavorites);
+
+      try {
+        // Tambahkan ke database
+        await axios.post("http://localhost:5000/favorites", {
+          name: thisLocation,
+        });
+        setMessage(`${thisLocation} berhasil ditambahkan ke daftar favorit!`);
+        setIsModalOpen(true);
+      } catch (error) {
+        console.error("Gagal menambahkan data ke database:", error);
+      }
     } else if (thisLocation) {
       setMessage(`${thisLocation} sudah ada di daftar favorit!`);
-      setIsModalOpen(true); // Tampilkan modal
+      setIsModalOpen(true);
     }
   };
 
-  const removeFavorite = (city) => {
-    setFavorites(favorites.filter((fav) => fav !== city));
+  const removeFavorite = async (city) => {
+    const newFavorites = favorites.filter((fav) => fav !== city);
+    saveFavorites(newFavorites);
+
+    try {
+      // Hapus dari database
+      const favoriteToDelete = favorites.find((fav) => fav === city);
+      await axios.delete(
+        `http://localhost:5000/favorites/${favoriteToDelete.id}`
+      );
+      setMessage(`${city} berhasil dihapus dari daftar favorit!`);
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error("Gagal menghapus data dari database:", error);
+    }
   };
 
   const selectFavorite = (city) => {
@@ -42,7 +82,6 @@ function App() {
   return (
     <Router>
       <div className="w-full h-screen text-white relative">
-        {/* Background layout */}
         <BackgroundLayout />
 
         {/* Navbar */}
@@ -82,51 +121,53 @@ function App() {
           {/* Hamburger menu icon for Mobile */}
           <div className="md:hidden flex items-center">
             <button
-              onClick={() => setMenuOpen(!menuOpen)} // Toggle menu on click
-              className={`text-white text-3xl transition-all duration-300 transform ${
+              onClick={() => setMenuOpen(!menuOpen)}
+              className={`text-3xl text-white transition-transform duration-300 transform ${
                 menuOpen ? "rotate-45" : ""
               }`}
             >
-              {menuOpen ? "X" : "☰"} {/* Toggle between hamburger and X */}
+              ☰ {/* Hamburger icon */}
             </button>
           </div>
         </nav>
 
         {/* Mobile Menu (Appears when menuOpen is true) */}
-        {menuOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-20">
-            <div className="flex flex-col items-center bg-white p-6 rounded-t-3xl animate-slide-in">
-              <Link
-                to="/"
-                className="px-4 py-2 bg-blue-600 rounded my-2"
-                onClick={() => setMenuOpen(false)} // Close the menu on click
-              >
-                Home
-              </Link>
-              <Link
-                to="/forecast"
-                className="px-4 py-2 bg-blue-600 rounded my-2"
-                onClick={() => setMenuOpen(false)} // Close the menu on click
-              >
-                Ramalan
-              </Link>
-              <Link
-                to="/favorites"
-                className="px-4 py-2 bg-blue-600 rounded my-2"
-                onClick={() => setMenuOpen(false)} // Close the menu on click
-              >
-                Kota Favorit
-              </Link>
-              {/* Close button (just the "X") */}
-              <button
-                onClick={() => setMenuOpen(false)} // Close the menu on button click
-                className="mt-4 text-3xl text-black"
-              >
-                X
-              </button>
-            </div>
+        <div
+          className={`fixed inset-0 w-full bg-black bg-opacity-50 z-20 transition-all duration-300 transform ${
+            menuOpen ? "translate-y-0" : "translate-y-full"
+          } backdrop-blur-md`} // Glassmorphism effect with backdrop blur
+        >
+          <div className="flex flex-col items-center bg-white p-6 space-y-4 glassCard">
+            {/* Close Button */}
+            <button
+              onClick={() => setMenuOpen(false)}
+              className="absolute top-4 left-4 text-3xl text-black"
+            >
+              X {/* Close Button (X) */}
+            </button>
+            <Link
+              to="/"
+              className="px-4 py-2 bg-cyan-400 rounded my-2"
+              onClick={() => setMenuOpen(false)}
+            >
+              Home
+            </Link>
+            <Link
+              to="/forecast"
+              className="px-4 py-2 bg-cyan-400 rounded my-2"
+              onClick={() => setMenuOpen(false)}
+            >
+              Ramalan
+            </Link>
+            <Link
+              to="/favorites"
+              className="px-4 py-2 bg-cyan-400 rounded my-2"
+              onClick={() => setMenuOpen(false)}
+            >
+              Kota Favorit
+            </Link>
           </div>
-        )}
+        </div>
 
         {/* Modal */}
         {isModalOpen && (
@@ -135,7 +176,7 @@ function App() {
               <p>{message}</p>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
+                className="mt-4 px-4 py-2 bg-cyan-400 text-white rounded"
               >
                 OK
               </button>

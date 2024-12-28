@@ -47,7 +47,7 @@ const WeatherCard = ({
       {/* Tombol Add Favorite */}
       <button
         onClick={addFavorite}
-        className="absolute top-4 right-4 bg-blue-600 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
+        className="absolute top-4 right-4 bg-blue-600 text-white font-bold glasscard rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
         title="Add to Favorites"
       >
         +

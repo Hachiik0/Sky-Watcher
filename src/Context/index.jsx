@@ -9,6 +9,23 @@ export const StateContextProvider = ({ children }) => {
   const [place, setPlace] = useState("Yogyakarta");
   const [thisLocation, setLocation] = useState("");
 
+  // Tambahkan fungsi untuk sinkronisasi dengan db.json
+  const fetchFavoritesFromDB = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/favorites");
+      const dbFavorites = response.data;
+      localStorage.setItem("favorites", JSON.stringify(dbFavorites));
+      setFavorites(dbFavorites); // Perbarui state lokal
+    } catch (error) {
+      console.error("Gagal memuat data dari database:", error);
+    }
+  };
+
+  // Panggil fungsi ini di dalam useEffect untuk sinkronisasi awal
+  useEffect(() => {
+    fetchFavoritesFromDB();
+  }, []);
+
   // fetch api
   const fetchWeather = async () => {
     const options = {

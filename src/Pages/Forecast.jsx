@@ -66,12 +66,12 @@ const Forecast = () => {
 
             {/* Detail tambahan */}
             <div className="w-full flex justify-between items-center mt-4 gap-4">
-              <p className="flex-1 text-center p-2 font-bold bg-cyan-400 shadow rounded-lg">
-                Max Temp <p className="font-normal">{curr.max_temp}°C</p>
-              </p>
-              <p className="flex-1 text-center p-2 font-bold rounded-lg bg-cyan-400">
-                Min Temp <p className="font-normal">{curr.min_temp}°C</p>
-              </p>
+              <div className="flex-1 text-center p-2 font-bold bg-cyan-400 shadow rounded-lg">
+                Max Temp <span className="font-normal">{curr.max_temp}°C</span>
+              </div>
+              <div className="flex-1 text-center p-2 font-bold rounded-lg bg-cyan-400">
+                Min Temp <span className="font-normal">{curr.min_temp}°C</span>
+              </div>
             </div>
           </div>
         ))}

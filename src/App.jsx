@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import "./App.css";
 import search from "./assets/icons/search.svg";
@@ -20,16 +20,19 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false); // State untuk modal
 
   // Fungsi untuk menyimpan favorit ke localStorage dan db.json
-  const saveFavorites = async (newFavorites) => {
-    setFavorites(newFavorites);
-    localStorage.setItem("favorites", JSON.stringify(newFavorites));
+  const saveFavorites = (favoritesData) => {
+    // Simpan data favorit ke localStorage
+    localStorage.setItem("favorites", JSON.stringify(favoritesData));
 
-    try {
-      // Sinkronkan ke database (update semua data)
-      await axios.put("http://localhost:5000/favorites", newFavorites);
-    } catch (error) {
-      console.error("Gagal menyimpan data ke database:", error);
-    }
+    // Simpan data favorit ke database (db.json)
+    axios
+      .put(`http://localhost:5000/favorites/${favoritesData.id}`, favoritesData)
+      .then(() => {
+        console.log("Data berhasil disimpan ke db.json");
+      })
+      .catch((error) => {
+        console.error("Gagal menyimpan data ke database:", error);
+      });
   };
 
   const submitCity = () => {
@@ -38,18 +41,37 @@ function App() {
   };
 
   const addFavorite = async () => {
-    if (!favorites.some((fav) => fav.name === thisLocation) && thisLocation) {
-      const newFavorite = { id: new Date().getTime(), name: thisLocation }; // Menambahkan id baru
+    console.log("thisLocation:", thisLocation); // Periksa nilai thisLocation
+    console.log("favorites:", favorites); // Periksa daftar favorit saat ini
+
+    if (thisLocation && !favorites.some((fav) => fav.name === thisLocation)) {
+      const newFavorite = {
+        id: new Date().getTime(), // Pastikan id valid
+        name: thisLocation,
+        location: thisLocation,
+      };
+
       const newFavorites = [...favorites, newFavorite];
-      saveFavorites(newFavorites);
 
       try {
-        // Tambahkan ke database
+        // Mengirim data favorit baru ke server (db.json)
         await axios.post("http://localhost:5000/favorites", newFavorite);
-        setMessage(`${thisLocation} berhasil ditambahkan ke daftar favorit!`);
+
+        // Update state favorites setelah data berhasil ditambahkan
+        setFavorites(newFavorites);
+
+        // Simpan data favorit ke localStorage
+        localStorage.setItem("favorites", JSON.stringify(newFavorites));
+
+        // Tampilkan pesan sukses
+        setMessage(
+          `${thisLocation} berhasil ditambahkan ke daftar kota favorit!`
+        );
         setIsModalOpen(true);
       } catch (error) {
         console.error("Gagal menambahkan data ke database:", error);
+        setMessage("Terjadi kesalahan saat menambahkan ke favorit.");
+        setIsModalOpen(true);
       }
     } else if (thisLocation) {
       setMessage(`${thisLocation} sudah ada di daftar favorit!`);
@@ -57,14 +79,21 @@ function App() {
     }
   };
 
-  const removeFavorite = async (city) => {
-    const newFavorites = favorites.filter((fav) => fav.id !== city.id); // Menghapus berdasarkan id
-    saveFavorites(newFavorites);
+  const removeFavorite = async (id) => {
+    console.log("ID favorit yang akan dihapus:", id); // Periksa id yang akan dihapus
+    console.log("Tipe data ID:", typeof id); // Memeriksa tipe data ID
+    console.log("favorites sebelum dihapus:", favorites);
+
+    // Jika id adalah objek, ambil id.id atau pastikan id tersebut adalah ID yang valid
+    const favoriteId = id.id || id; // Mengambil id yang benar jika id adalah objek
+
+    const newFavorites = favorites.filter((fav) => fav.id !== favoriteId);
+    saveFavorites(newFavorites); // Menyimpan perubahan favorit
 
     try {
-      // Hapus dari database
-      await axios.delete(`http://localhost:5000/favorites/${city.id}`);
-      setMessage(`${city.name} berhasil dihapus dari daftar favorit!`);
+      await axios.delete(`http://localhost:5000/favorites/${favoriteId}`); // Menggunakan favoriteId yang benar
+      setFavorites(newFavorites);
+      setMessage("Kota berhasil dihapus!");
       setIsModalOpen(true);
     } catch (error) {
       console.error("Gagal menghapus data dari database:", error);
@@ -74,6 +103,20 @@ function App() {
   const selectFavorite = (city) => {
     setPlace(city);
   };
+
+  useEffect(() => {
+    // Mengambil data favorit dari db.json saat pertama kali load
+    axios
+      .get("http://localhost:5000/favorites")
+      .then((response) => {
+        setFavorites(response.data);
+        // Simpan data favorit ke localStorage
+        localStorage.setItem("favorites", JSON.stringify(response.data));
+      })
+      .catch((error) => {
+        console.error("Gagal mengambil data dari server:", error);
+      });
+  }, []);
 
   return (
     <Router>

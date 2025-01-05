@@ -11,52 +11,39 @@ import Sunny from "../assets/images/Sunny.jpg";
 
 const BackgroundLayout = () => {
   const { weather } = useStateContext();
-  const [background, setBackground] = useState(Clear);
+  const [image, setImage] = useState(Clear);
 
   useEffect(() => {
     if (weather.conditions) {
       let imageString = weather.conditions;
       if (imageString.toLowerCase().includes("clear")) {
-        setBackground(Clear);
+        setImage(Clear);
       } else if (imageString.toLowerCase().includes("cloud")) {
-        setBackground(Cloudy);
+        setImage(Cloudy);
       } else if (
         imageString.toLowerCase().includes("rain") ||
         imageString.toLowerCase().includes("shower")
       ) {
-        setBackground(Rainy); // Gunakan video hujan
+        setImage(Rainy);
       } else if (imageString.toLowerCase().includes("snow")) {
-        setBackground(Snow);
+        setImage(Snow);
       } else if (imageString.toLowerCase().includes("fog")) {
-        setBackground(Fog);
+        setImage(Fog);
       } else if (
         imageString.toLowerCase().includes("thunder") ||
         imageString.toLowerCase().includes("storm")
       ) {
-        setBackground(Stormy);
+        setImage(Stormy);
       }
     }
   }, [weather]);
 
   return (
-    <div className="h-screen w-full fixed left-0 top-0 -z-[10]">
-      {typeof background === "string" ? (
-        <img
-          src={background}
-          alt="background"
-          className="h-full w-full object-cover"
-        />
-      ) : (
-        <video
-          src={background}
-          type="video/mp4"
-          autoPlay
-          loop
-          muted
-          className="h-full w-full object-cover"
-        />
-      )}
-    </div>
+    <img
+      src={image}
+      alt="weather_image"
+      className="h-screen w-full fixed left-0 top-0 -z-[10]"
+    />
   );
 };
 

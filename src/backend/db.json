@@ -1,28 +1,19 @@
 {
   "favorites": [
     {
-      "id": "ab1d",
-      "name": "Jambi, Indonesia"
+      "id": 1735922877214,
+      "name": "Jambi, Indonesia",
+      "location": "Jambi, Indonesia"
     },
     {
-      "id": "1735394983320",
-      "name": "Magelang, Indonesia"
+      "id": 1735923193306,
+      "name": "Cimahi, Indonesia",
+      "location": "Cimahi, Indonesia"
     },
     {
-      "id": "1735395982935",
-      "name": "Bandung, Indonesia"
-    },
-    {
-      "id": "1735395992065",
-      "name": "Yogyakarta, Indonesia"
-    },
-    {
-      "id": "1735396006588",
-      "name": "Bosna i Hercegovina"
-    },
-    {
-      "id": 1735444647649,
-      "name": "Semarang, Indonesia"
+      "id": 1735979645633,
+      "name": "Papua, Indonesia",
+      "location": "Papua, Indonesia"
     }
   ]
 }

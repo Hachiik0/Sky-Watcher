@@ -31,7 +31,7 @@ const FavoritesPage = ({ favorites, selectFavorite, removeFavorite }) => {
                   Liat cuaca
                 </button>
                 <button
-                  onClick={() => removeFavorite(city)} // Menghapus berdasarkan city object
+                  onClick={() => removeFavorite(city)} //
                   className="px-3 py-1 bg-red-500 rounded"
                 >
                   Hapus

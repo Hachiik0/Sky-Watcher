@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useDate } from "../Utils/useDate";
 import sun from "../assets/icons/sun.png";
 import cloud from "../assets/icons/cloud.png";
@@ -9,6 +9,21 @@ import storm from "../assets/icons/storm.png";
 import wind from "../assets/icons/windy.png";
 import "../index.css";
 
+const getWeatherIcon = (iconString) => {
+  if (!iconString) return sun;
+
+  const lowerCaseString = iconString.toLowerCase();
+  if (lowerCaseString.includes("cloud")) return cloud;
+  if (lowerCaseString.includes("rain")) return rain;
+  if (lowerCaseString.includes("clear")) return sun;
+  if (lowerCaseString.includes("thunder")) return storm;
+  if (lowerCaseString.includes("fog")) return fog;
+  if (lowerCaseString.includes("snow")) return snow;
+  if (lowerCaseString.includes("wind")) return wind;
+
+  return sun; // Default icon
+};
+
 const WeatherCard = ({
   temperature,
   windspeed,
@@ -17,43 +32,25 @@ const WeatherCard = ({
   heatIndex,
   iconString,
   conditions,
-  addFavorite, // Tambahkan prop addFavorite
+  addFavorite,
 }) => {
-  const [icon, setIcon] = useState(sun);
+  const icon = getWeatherIcon(iconString);
   const { time } = useDate();
-
-  useEffect(() => {
-    if (iconString) {
-      if (iconString.toLowerCase().includes("cloud")) {
-        setIcon(cloud);
-      } else if (iconString.toLowerCase().includes("rain")) {
-        setIcon(rain);
-      } else if (iconString.toLowerCase().includes("clear")) {
-        setIcon(sun);
-      } else if (iconString.toLowerCase().includes("thunder")) {
-        setIcon(storm);
-      } else if (iconString.toLowerCase().includes("fog")) {
-        setIcon(fog);
-      } else if (iconString.toLowerCase().includes("snow")) {
-        setIcon(snow);
-      } else if (iconString.toLowerCase().includes("wind")) {
-        setIcon(wind);
-      }
-    }
-  }, [iconString]);
 
   return (
     <div className="w-[22rem] min-w-[22rem] h-[30rem] glassCard p-4 relative">
       {/* Tombol Add Favorite */}
       <button
-        onClick={addFavorite}
-        className="absolute top-4 right-4 bg-blue-600 text-white font-bold glasscard rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
+        onClick={() => {
+          if (place) addFavorite();
+        }}
+        className="absolute top-4 right-4 bg-blue-600 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
         title="Add to Favorites"
       >
         +
       </button>
 
-      <div className="flex w-full just-center, items-center gap-4 mt-12 mb-4">
+      <div className="flex w-full items-center gap-4 mt-12 mb-4">
         <img src={icon} alt="weather_icon" />
         <p className="font-bold text-5xl flex justify-center items-center">
           {temperature} &deg;C
@@ -68,9 +65,9 @@ const WeatherCard = ({
         <div className="flex-1 text-center p-2 font-bold bg-cyan-400 shadow rounded-lg">
           Wind Speed <span className="font-normal">{windspeed} km/h</span>
         </div>
-        <p className="flex-1 text-center p-2 font-bold rounded-lg bg-cyan-400">
-          Humidity <p className="font-normal">{humidity} gm/m&#179;</p>
-        </p>
+        <div className="flex-1 text-center p-2 font-bold rounded-lg bg-cyan-400">
+          Humidity <span className="font-normal">{humidity} gm/m&#179;</span>
+        </div>
       </div>
       <div className="w-full p-3 mt-4 flex justify-between items-center">
         <p className="font-semibold text-lg">Heat Index</p>
